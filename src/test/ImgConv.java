@@ -11,8 +11,8 @@ public class ImgConv {
     }
 
     public static void main(String[] args) {
-        String path_in = "C:Users/dominant/amarec(20161008-233628).png";
-        String path_out = "C:Users/dominant/amarec(20161008-233628)_.png";
+        String path_in = "C:/Users/dominant/lena_lg.jpg";
+        String path_out = "C:/Users/dominant/lena_lg_.jpg";
 
         Mat mat_src = new Mat();
         Mat mat_dst = new Mat();
