@@ -2,12 +2,8 @@ package test;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
 
 public class Trimming {
@@ -42,6 +38,9 @@ public class Trimming {
         Mat im_mouse = new Mat(im, roi_mouse);
         Imgcodecs.imwrite(path_out + "_mouse.bmp", im_mouse);
 
+
+        //なんでか知らんが下の「Imgproc.rectangle」がgitだとエラーになる。
+        /*
 		double[] data_eyer = new double[3];
 		double[] data_eyel = new double[3];
 		double[] data_nose = new double[3];
@@ -63,7 +62,7 @@ public class Trimming {
         Mat im3 = new Mat();
 		Imgproc.blur(im, im3, new Size(5, 5));
 		Imgcodecs.imwrite(path_out+"_new.bmp", im3);
-
+		*/
 
     }
 }
