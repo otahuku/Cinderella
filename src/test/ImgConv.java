@@ -11,7 +11,7 @@ public class ImgConv {
     }
 
     public static void main(String[] args) {
-        String path_in = "C:/Users/dominant/lena_lg.jpg";
+        String path_in = "C:/Users/dominant/lena_lg.jpg"; //適宜C:/temp等にすること
         String path_out = "C:/Users/dominant/lena_lg_.jpg";
 
         Mat mat_src = new Mat();
