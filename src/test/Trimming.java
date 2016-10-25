@@ -60,6 +60,7 @@ public class Trimming {
         Mat im_mouth = new Mat(im, roi_mouth);
         Highgui.imwrite(path_out + "_mouth.bmp", im_mouth);
 
+
         //各パーツの近くの色を取得、各roiの四角形を描画
         //パーツの範囲が広すぎて的確な色の抽出が困難なためコメント化中
 /*
@@ -81,7 +82,7 @@ public class Trimming {
 
 		//一部ぼかし
         //bit演算を用いてます
-		Mat gray = blur(im);
+		Mat bl = blur(im);
 		Mat mask = new Mat(im.rows(), im.cols(), im.type(), new Scalar(0,0,0));
 
 		Core.rectangle(mask, new Point(eyer[0], eyer[1]), new Point(eyer[0]+eyer[2],eyer[1]+eyer[3]), new Scalar(255,255,255), -1);
@@ -89,16 +90,17 @@ public class Trimming {
 		Core.rectangle(mask, new Point(nose[0], nose[1]), new Point(nose[0]+nose[2],nose[1]+nose[3]), new Scalar(255,255,255), -1);
 		Core.rectangle(mask, new Point(mouth[0], mouth[1]), new Point(mouth[0]+mouth[2],mouth[1]+mouth[3]), new Scalar(255,255,255), -1);
 
-		Core.bitwise_and(gray, mask, gray);
+		Core.bitwise_and(bl, mask, bl);
 		Core.bitwise_not(mask, mask);
 		Core.bitwise_and(im, mask, im);
 		Mat dst = new Mat();
-		Core.bitwise_or(im, gray, dst);
+		Core.bitwise_or(im, bl, dst);
 
 		Highgui.imwrite(path_out+"_new.bmp", dst);
 		System.out.println("Done!!");
 	}
 
+	//ぼかしメソッド(短い)
 	static Mat blur(Mat image){
 		Mat im = new Mat();
 		Imgproc.blur(image, im, new Size(30, 30));
