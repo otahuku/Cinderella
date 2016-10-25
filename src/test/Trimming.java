@@ -61,6 +61,8 @@ public class Trimming {
         Highgui.imwrite(path_out + "_mouth.bmp", im_mouth);
 
         //各パーツの近くの色を取得、各roiの四角形を描画
+        //パーツの範囲が広すぎて的確な色の抽出が困難なためコメント化中
+/*
 		double[] data_eyer = new double[3];
 		double[] data_eyel = new double[3];
 		double[] data_nose = new double[3];
@@ -75,19 +77,31 @@ public class Trimming {
 		Core.rectangle(im, new Point(eyel[0], eyel[1]), new Point(eyel[0]+eyel[2],eyel[1]+eyel[3]), new Scalar(data_eyel[0],data_eyel[1],data_eyel[2]), -1);
 		Core.rectangle(im, new Point(nose[0], nose[1]), new Point(nose[0]+nose[2],nose[1]+nose[3]), new Scalar(data_nose[0],data_nose[1],data_nose[2]), -1);
 		Core.rectangle(im, new Point(mouth[0], mouth[1]), new Point(mouth[0]+mouth[2],mouth[1]+mouth[3]), new Scalar(data_mouth[0],data_mouth[1],data_mouth[2]), -1);
+*/
 
+		//一部ぼかし
+        //bit演算を用いてます
+		Mat gray = blur(im);
+		Mat mask = new Mat(im.rows(), im.cols(), im.type(), new Scalar(0,0,0));
 
-		//ぼかしたい
-        Mat im3 = blur(im);
+		Core.rectangle(mask, new Point(eyer[0], eyer[1]), new Point(eyer[0]+eyer[2],eyer[1]+eyer[3]), new Scalar(255,255,255), -1);
+		Core.rectangle(mask, new Point(eyel[0], eyel[1]), new Point(eyel[0]+eyel[2],eyel[1]+eyel[3]), new Scalar(255,255,255), -1);
+		Core.rectangle(mask, new Point(nose[0], nose[1]), new Point(nose[0]+nose[2],nose[1]+nose[3]), new Scalar(255,255,255), -1);
+		Core.rectangle(mask, new Point(mouth[0], mouth[1]), new Point(mouth[0]+mouth[2],mouth[1]+mouth[3]), new Scalar(255,255,255), -1);
 
+		Core.bitwise_and(gray, mask, gray);
+		Core.bitwise_not(mask, mask);
+		Core.bitwise_and(im, mask, im);
+		Mat dst = new Mat();
+		Core.bitwise_or(im, gray, dst);
 
-		Highgui.imwrite(path_out+"_new.bmp", im3);
+		Highgui.imwrite(path_out+"_new.bmp", dst);
 		System.out.println("Done!!");
 	}
 
 	static Mat blur(Mat image){
 		Mat im = new Mat();
-		Imgproc.blur(image, im, new Size(5, 5));
+		Imgproc.blur(image, im, new Size(30, 30));
 		return im;
 	}
 
