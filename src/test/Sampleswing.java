@@ -21,7 +21,7 @@ public class Sampleswing extends JFrame {
 	private JTextField textField;
 
 	/**
-	 * Launch the application.
+	 * Launch the application.ra
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
