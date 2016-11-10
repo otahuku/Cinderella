@@ -11,7 +11,6 @@ public class Mask {
     public static String nose_cascade = Path+"/OpenCV/haarcascades/haarcascade_mcs_nose.xml";
     public static String mouth_cascade = Path+"/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
 
-
     public static String Photo_Path ="man.png";
     public static String path_out = "C:/prj/man";
     public static String Project_Path=Path+Photo_Path;
