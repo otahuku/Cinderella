@@ -3,29 +3,40 @@ package test;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
 
 public class Mask {
 	final static String Path= "C:/prj/";
 	public static String face_cascade = Path+"/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml";
-    public static String eye_cascade = Path+"/OpenCV//haarcascades/haarcascade_eye.xml";
-    public static String nose_cascade = Path+"/OpenCV/haarcascades/haarcascade_mcs_nose.xml";
-    public static String mouth_cascade = Path+"/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
 
-    public static String Photo_Path ="man.png";
-    public static String path_out = "C:/prj/man";
+    //public static String Photo_Path ="man.png";//今でしょもどき
+    //public static String path_out = "C:/prj/man";
+
+    public static String Photo_Path ="tkkrkn.png";//高倉健さん
+    public static String path_out = "C:/prj/tkkrkn";
+
     public static String Project_Path=Path+Photo_Path;
+
 
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mat im= Highgui.imread(Project_Path,-1);//読み込み
 
+		face face = new face();
+		face.GetFace(im);
+
+
         //マスクの用意
-		Mat mask2 = Highgui.imread("C:/prj/manmask.png",-1);//パーツ部分が白、他が黒のマスク
+		//Mat mask2 = Highgui.imread("C:/prj/manmask.png",-1);//パーツ部分が白、他が黒のマスク
+		Mat mask2 = Highgui.imread("C:/prj/maskn.png",-1);//高倉健さん用
 		tohka(mask2);//黒部分を透過させる
 		Mat mask = Highgui.imread("C:/prj/mansk.png",-1);//パーツ部分の白だけ残したマスク
 
@@ -37,13 +48,8 @@ public class Mask {
 		Highgui.imwrite(path_out+"_parts.png", dst);
 
 		//顔を埋める
-		//Mat hada = new Mat(im.rows(), im.cols(), im.type(), new Scalar(181,213,255,255));
 		Mat hada = blur(im);
-
-		Highgui.imwrite(path_out+"_blur.png",hada);
 		Core.bitwise_and(hada, mask2, hada);
-		Highgui.imwrite(path_out+"_blur2.png",hada);
-
 		Core.bitwise_not(mask2, mask2);
 		Core.bitwise_and(im, mask2, im);
 		Core.bitwise_or(im, hada, dst2);
@@ -52,7 +58,21 @@ public class Mask {
 		Highgui.imwrite(path_out+"_new.png", dst2);
 		Mat img= Highgui.imread(path_out+"_new.png");//読み込み
 		Mat res = new Mat();
-		Imgproc.bilateralFilter(img, res, 70,85,150);
+		Imgproc.bilateralFilter(img, res, 75,80,150);
+
+		//顔部分にだけ適用(顔が認識されない場合エラー)
+		/*
+		if(){
+			Mat trmask = new Mat(img.rows(), img.cols(), img.type(), new Scalar(0,0,0));
+			Core.rectangle(trmask, new Point(face.face.x, face.face.y),
+				new Point(face.face.x + face.face_width, face.face.y + face.face_height), new Scalar(255,255,255), -1);
+			Core.bitwise_and(res, trmask, res);
+			Core.bitwise_not(trmask, trmask);
+			Core.bitwise_and(img, trmask, img);
+			Core.bitwise_or(img, res, res);
+		}
+		*/
+
 		Highgui.imwrite(path_out+"_new.png", res);
 
 
@@ -98,6 +118,29 @@ public class Mask {
         return result;
     }
 
+
+    static class face{
+		Point face;
+		int face_width;
+		int face_height;
+
+		void GetFace(Mat im){
+			CascadeClassifier faceDetector = new CascadeClassifier(Path+"/openCV/haarcascades/haarcascade_frontalface_alt.xml");
+			MatOfRect faceDetections = new MatOfRect();
+			faceDetector.detectMultiScale(im, faceDetections);
+
+	        for (Rect rect : faceDetections.toArray()) {
+	            face=new Point(rect.x,rect.y);
+	            face_width=rect.width;
+	            face_height=rect.height;
+	            break;
+	        }
+
+		}
+
+    }
 }
+
+
 
 //Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV); BGR -> HSV
