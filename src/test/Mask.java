@@ -19,8 +19,11 @@ public class Mask {
     //public static String Photo_Path ="man.png";//今でしょもどき
     //public static String path_out = "C:/prj/man";
 
-    public static String Photo_Path ="tkkrkn.png";//高倉健さん
-    public static String path_out = "C:/prj/tkkrkn";
+    //public static String Photo_Path ="tkkrkn.png";//高倉健さん
+    //public static String path_out = "C:/prj/tkkrkn";
+
+    public static String Photo_Path ="tmpp.png";//ともぴっぴ
+    public static String path_out = "C:/prj/tmpp";
 
     public static String Project_Path=Path+Photo_Path;
 
@@ -30,18 +33,29 @@ public class Mask {
 
 		Mat im= Highgui.imread(Project_Path,-1);//読み込み
 
-		face face = new face();
-		face.GetFace(im);
+		//あとで重ねあわせる用
+		Mat im_cl= Highgui.imread(Project_Path);
 
+		//Mat mask_cl = Highgui.imread("C:/prj/manmask.png");//今でしょもどき
+		//Mat mask_cl = Highgui.imread("C:/prj/tkkrmask.png");//高倉健さん
+		Mat mask_cl = Highgui.imread("C:/prj/tmppmask.png");//ともぴっぴ
+		Core.bitwise_not(mask_cl, mask_cl);
 
         //マスクの用意
-		//Mat mask2 = Highgui.imread("C:/prj/manmask.png",-1);//パーツ部分が白、他が黒のマスク
-		Mat mask2 = Highgui.imread("C:/prj/maskn.png",-1);//高倉健さん用
-		tohka(mask2);//黒部分を透過させる
-		Mat mask = Highgui.imread("C:/prj/mansk.png",-1);//パーツ部分の白だけ残したマスク
+		//Mat mask2 = Highgui.imread("C:/prj/manmask.png",-1);//今でしょもどき
+		//Mat mask2 = Highgui.imread("C:/prj/tkkrmask.png",-1);//高倉健さん
+		Mat mask2 = Highgui.imread("C:/prj/tmppmask.png",-1);//ともぴっぴ
+		tohka(mask2);//黒部分を透過
+		Mat mask = Highgui.imread("C:/prj/maska.png",-1);//パーツ部分の白マスク
 
 		Mat dst = new Mat();
 		Mat dst2 = new Mat();
+
+		face face = new face();
+		face.GetFace(im);
+		//int[] size = {(int)face.face.x,(int)face.face.y,face.face_width,face.face_height};
+		//int size[] = {370,100,283,369};//高倉健さん
+		int size[] = {460,430,490,470};//ともぴっぴ
 
 		//パーツ部分だけ切り出し
 		Core.bitwise_and(im, mask, dst);
@@ -55,25 +69,26 @@ public class Mask {
 		Core.bitwise_or(im, hada, dst2);
 
 		//ノイズ除去
-		Highgui.imwrite(path_out+"_new.png", dst2);
-		Mat img= Highgui.imread(path_out+"_new.png");//読み込み
-		Mat res = new Mat();
-		Imgproc.bilateralFilter(img, res, 75,80,150);
+		Highgui.imwrite(path_out+"_null.png", dst2);
+		Mat img= Highgui.imread(path_out+"_null.png");//読み込み
+		Mat noise = new Mat();
+		Imgproc.bilateralFilter(img, noise, 75,90,210);
+		//Imgproc.pyrMeanShiftFiltering(noise, noise, 0.1,0.1);
+
 
 		//顔部分にだけ適用(顔が認識されない場合エラー)
-		/*
-		if(){
-			Mat trmask = new Mat(img.rows(), img.cols(), img.type(), new Scalar(0,0,0));
-			Core.rectangle(trmask, new Point(face.face.x, face.face.y),
-				new Point(face.face.x + face.face_width, face.face.y + face.face_height), new Scalar(255,255,255), -1);
-			Core.bitwise_and(res, trmask, res);
-			Core.bitwise_not(trmask, trmask);
-			Core.bitwise_and(img, trmask, img);
-			Core.bitwise_or(img, res, res);
-		}
-		*/
+		Mat res = adapt(img,noise,size);
 
-		Highgui.imwrite(path_out+"_new.png", res);
+		//res = gammaFilter(res,0.9);
+		Highgui.imwrite(path_out+"_null.png", res);
+
+
+		res.copyTo(im_cl,mask_cl);
+		Mat fres = new Mat();
+		Imgproc.bilateralFilter(im_cl, fres, 7,65,20);
+		fres = adapt(im_cl,fres,size);
+		Highgui.imwrite(path_out+"_new.png", fres);
+
 
 
 		System.out.println("Done!!");
@@ -81,20 +96,36 @@ public class Mask {
 
 	//白以外透過させるメソッド
 	static Mat tohka(Mat mat){
-		Mat matt = mat;
-	    for (int y = 0; y < matt.cols(); y++) {
-	        for (int x = 0; x < matt.rows(); x++) {
-	            double px[] = matt.get(x, y);
+		Mat reslut = mat;
+	    for (int y = 0; y < reslut.cols(); y++) {
+	        for (int x = 0; x < reslut.rows(); x++) {
+	            double px[] = reslut.get(x, y);
 	            if (px[0] + px[1] + px[2] < 765) {
 	            	double [] data = {px[0],px[1],px[2],-1};
-	            	matt.put(x,y,data);
+	            	reslut.put(x,y,data);
 	            }
 	        }
 	    }
-	    Highgui.imwrite("C:/prj/mansk.png",matt);
-		return matt;
+	    Highgui.imwrite("C:/prj/maska.png",reslut);
+		return reslut;
 	}
 
+
+	//何かしら処理したものを顔部分にだけ適用させるメソッド
+	public static Mat adapt(Mat img, Mat noise, int size[]){
+		Mat trmask = new Mat(img.rows(), img.cols(), img.type(), new Scalar(0,0,0));
+		Mat res = noise.clone();
+
+		Core.rectangle(trmask, new Point(size[0], size[1]),
+			new Point(size[0]+size[2],size[1]+size[3]), new Scalar(255,255,255), -1);//高倉健さんの顔位置
+
+		Core.bitwise_and(res, trmask, res);
+		Core.bitwise_not(trmask, trmask);
+		Core.bitwise_and(img, trmask, img);
+		Core.bitwise_or(img, res, res);
+
+		return res;
+	}
 	//ぼかし
 	static Mat blur(Mat image){
 		Mat im = new Mat();
