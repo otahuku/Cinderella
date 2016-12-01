@@ -22,11 +22,14 @@ public class Mask {
     //public static String Photo_Path ="tkkrkn.png";//高倉健さん
     //public static String path_out = "C:/prj/tkkrkn";
 
-    public static String Photo_Path ="tmpp.png";//ともぴっぴ
-    public static String path_out = "C:/prj/tmpp";
+    //public static String Photo_Path ="tmpp.png";//ともぴっぴ
+    //public static String path_out = "C:/prj/tmpp";
+
+    public static String Photo_Path ="frenchman.png";//謎の西洋人
+    public static String path_out = "C:/prj/frenchman";
+
 
     public static String Project_Path=Path+Photo_Path;
-
 
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -38,13 +41,16 @@ public class Mask {
 
 		//Mat mask_cl = Highgui.imread("C:/prj/manmask.png");//今でしょもどき
 		//Mat mask_cl = Highgui.imread("C:/prj/tkkrmask.png");//高倉健さん
-		Mat mask_cl = Highgui.imread("C:/prj/tmppmask.png");//ともぴっぴ
+		//Mat mask_cl = Highgui.imread("C:/prj/tmppmask.png");//ともぴっぴ
+		Mat mask_cl = Highgui.imread("C:/prj/frenchmask.png");//謎の西洋人
 		Core.bitwise_not(mask_cl, mask_cl);
 
         //マスクの用意
 		//Mat mask2 = Highgui.imread("C:/prj/manmask.png",-1);//今でしょもどき
 		//Mat mask2 = Highgui.imread("C:/prj/tkkrmask.png",-1);//高倉健さん
-		Mat mask2 = Highgui.imread("C:/prj/tmppmask.png",-1);//ともぴっぴ
+		//Mat mask2 = Highgui.imread("C:/prj/tmppmask.png",-1);//ともぴっぴ
+		Mat mask2 = Highgui.imread("C:/prj/frenchmask.png",-1);//謎の西洋人
+
 		tohka(mask2);//黒部分を透過
 		Mat mask = Highgui.imread("C:/prj/maska.png",-1);//パーツ部分の白マスク
 
@@ -55,7 +61,8 @@ public class Mask {
 		face.GetFace(im);
 		//int[] size = {(int)face.face.x,(int)face.face.y,face.face_width,face.face_height};
 		//int size[] = {370,100,283,369};//高倉健さん
-		int size[] = {460,430,490,470};//ともぴっぴ
+		//int size[] = {460,430,490,470};//ともぴっぴ
+		int size[] = {320,660,780,900};//謎の西洋人
 
 		//パーツ部分だけ切り出し
 		Core.bitwise_and(im, mask, dst);
