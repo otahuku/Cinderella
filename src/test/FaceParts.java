@@ -9,6 +9,8 @@ import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.objdetect.CascadeClassifier;
 
+
+
 public class FaceParts {
 	final static String Path= "C:/project/";
 	public static String face_cascade = Path+"/openCV/haarcascades/haarcascade_frontalface_alt2.xml";
@@ -29,23 +31,24 @@ public class FaceParts {
 		Mat im= Highgui.imread(Project_Path);
 
 		project.GetFace(im);
-		System.out.println(project.face.x+","+project.face.y);
+		System.out.println("face "+project.face.x+","+project.face.y);
 
 		project.GetLEye(im);
-		System.out.println(project.l_eye.x+","+project.l_eye.y);
+		System.out.println("L_eye "+project.l_eye.x+","+project.l_eye.y);
 
 		project.GetREye(im);
-		System.out.println(project.r_eye.x+","+project.r_eye.y);
+		System.out.println("R_eye "+project.r_eye.x+","+project.r_eye.y);
 
 		project.GetNose(im);
-		System.out.println(project.nose.x+","+project.nose.y);
+		System.out.println("Nose "+project.nose.x+","+project.nose.y);
 
 		project.GetMouth(im);
-		System.out.println(project.mouth.x+","+project.mouth.y);
+		System.out.println("mouth "+project.mouth.x+","+project.mouth.y);
 
+		project.GetMouth_full(im);
 
 		// 結果を保存
-//		Highgui.imwrite(Path+"/output_parts2.jpg", im);
+		Highgui.imwrite(Path+"/output_parts2.jpg", im);
 
 
 		System.out.println("Done!!");
@@ -71,6 +74,8 @@ public class FaceParts {
 		Point mouth;
 		int mouth_width;
 		int mouth_height;
+
+		Point Mouth_c;
 
 		void GetFace(Mat im){
 			CascadeClassifier faceDetector = new CascadeClassifier(Path+"/openCV/haarcascades/haarcascade_frontalface_alt.xml");
@@ -146,6 +151,23 @@ public class FaceParts {
 	    			break;
 	    		}
 			}
+	    }
+	    void GetMouth_full(Mat im){
+	    	double[] data = new double[3];
+	    	int[] mouth_center = new int[2];
+	    	mouth_center[0] = (int)(mouth.x) + (mouth_width/2);
+	    	mouth_center[1] = (int)(mouth.y) + (mouth_height/2);
+	    	Mouth_c=new Point(mouth_center[0],mouth_center[1]);
+
+	    	data = im.get(mouth_center[0], mouth_center[1]);
+	    	System.out.println("Blue：" + data[0]);
+	    	System.out.println("Green：" + data[1]);
+	    	System.out.println("Red：" + data[2]);
+	    	Core.rectangle(im, Mouth_c, Mouth_c, new Scalar(0, 0, 255), 1);
+
+	    }
+	    void GetRedSpace(Mat im){
+
 	    }
 	}
 
