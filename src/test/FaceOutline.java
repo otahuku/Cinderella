@@ -30,12 +30,16 @@ public class FaceOutline {
 	 
 	    //—ÖŠsŽæ“¾
 	    ////cv::findContours(binImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-		Mat hierarchy=Mat.zeros(new Size(5,5), CvType.CV_8UC1);  
+		//Mat hierarchy=Mat.zeros(new Size(5,5), CvType.CV_8UC1);
+		Mat hierarchy = new Mat();
 	    Imgproc.findContours(bin, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 	    
 
-	    System.out.println(contours.get(5));
+	    for(int i=0; i<10; i++){
+	    	System.out.println(contours.get(i));
+	    }
+	    Imgproc.drawContours(bin,  contours,  2,  new Scalar(255,0,0), -1);
 	    //Core.polylines(bin, contours, true, new Scalar(0,255,0), 5);
-		//Highgui.imwrite("C:/project/test2.png", bin);
+		Highgui.imwrite("C:/project/test2.png", bin);
 	}
 }
