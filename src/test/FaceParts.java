@@ -168,6 +168,7 @@ public class FaceParts {
 	    	System.out.println("Green：" + data[1]);
 	    	System.out.println("Red：" + data[2]);
 	    	Core.rectangle(im, Mouth_c, Mouth_c, new Scalar(0, 0, 255), 1);
+
 	    	return data;
 	    }
 
