@@ -45,8 +45,11 @@ public class FaceParts {
 		project.GetMouth(im);
 		System.out.println("mouth "+project.mouth.x+","+project.mouth.y);
 
-		project.GetMouth_full(im);
-
+		double RGB[]=project.GetMouth_RGB(im);
+		int[] HSV =project.RGBtoHSV((int)RGB[0], (int)RGB[1], (int)RGB[2]);
+		System.out.println("H="+HSV[0]);
+		System.out.println("S="+HSV[1]);
+		System.out.println("V="+HSV[2]);
 		// 結果を保存
 		Highgui.imwrite(Path+"/output_parts2.jpg", im);
 
@@ -152,7 +155,7 @@ public class FaceParts {
 	    		}
 			}
 	    }
-	    void GetMouth_full(Mat im){
+	    double[] GetMouth_RGB(Mat im){
 	    	double[] data = new double[3];
 	    	int[] mouth_center = new int[2];
 	    	mouth_center[0] = (int)(mouth.x) + (mouth_width/2);
@@ -160,12 +163,35 @@ public class FaceParts {
 	    	Mouth_c=new Point(mouth_center[0],mouth_center[1]);
 
 	    	data = im.get(mouth_center[0], mouth_center[1]);
+	    	System.out.println(mouth_center[0]+","+mouth_center[1]);
 	    	System.out.println("Blue：" + data[0]);
 	    	System.out.println("Green：" + data[1]);
 	    	System.out.println("Red：" + data[2]);
 	    	Core.rectangle(im, Mouth_c, Mouth_c, new Scalar(0, 0, 255), 1);
-
+	    	return data;
 	    }
+
+	    int[] RGBtoHSV(int red, int green, int blue){
+
+        int[] hsv = new int[3];
+        float max = Math.max(red, Math.max(green, blue));
+        float  min = Math.min(red, Math.min(green, blue));
+
+        // h
+        if(max == min)	hsv[0] = 0;
+        else if(max == red)	hsv[0] = (int) ((60 * (green - blue) / (max - min) + 360) % 360);
+        else if(max == green)	hsv[0] = (int) ((60 * (blue - red) / (max - min)) + 120);
+	    else if(max == blue)	hsv[0] = (int) ((60 * (red - green) / (max - min)) + 240);
+        // s
+        if(max == 0)	hsv[1] = 0;
+        else	hsv[1] = (int) (255 * ((max - min) / max));
+        // v
+        hsv[2] = (int)max;
+
+        return hsv;
+    }
+
+
 	    void GetRedSpace(Mat im){
 
 	    }
