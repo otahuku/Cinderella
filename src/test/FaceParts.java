@@ -6,6 +6,7 @@ import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.objdetect.CascadeClassifier;
 
@@ -23,7 +24,7 @@ public class FaceParts {
 	public static void main(String[] args) {
 
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	    String Photo_Path ="sample.jpg";
+	    String Photo_Path ="10683.jpg";
 	    String Project_Path=Path+Photo_Path;
 
 	    face project=new face();
@@ -39,6 +40,8 @@ public class FaceParts {
 		project.GetREye(im);
 		System.out.println("R_eye "+project.r_eye.x+","+project.r_eye.y);
 
+		project.DrawEyeCircle(im);
+
 		project.GetNose(im);
 		System.out.println("Nose "+project.nose.x+","+project.nose.y);
 
@@ -51,7 +54,7 @@ public class FaceParts {
 		System.out.println("S="+HSV[1]);
 		System.out.println("V="+HSV[2]);
 		// 結果を保存
-		Highgui.imwrite(Path+"/output_parts2.jpg", im);
+		Highgui.imwrite(Path+"/10683output_parts3.jpg", im);
 
 
 		System.out.println("Done!!");
@@ -102,7 +105,7 @@ public class FaceParts {
 			eyeDetector.detectMultiScale(im, eyeDetections);
 			for (Rect rect : eyeDetections.toArray()) {
 				if((rect.x > (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width > (face.x + face_width/2)) ){
-		    		Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255), 5);
+		    		//Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255), 5);
 					l_eye=new Point(rect.x,rect.y);
 		            l_eye_width=rect.width;
 		            l_eye_height=rect.height;
@@ -117,7 +120,7 @@ public class FaceParts {
 			eyeDetector.detectMultiScale(im, eyeDetections);
 			for (Rect rect : eyeDetections.toArray()) {
 				if((rect.x < (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width < (face.x + face_width/2)) ){
-		    		Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 180, 255), 5);
+		    		//Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 180, 255), 5);
 					r_eye=new Point(rect.x,rect.y);
 		            r_eye_width=rect.width;
 		            r_eye_height=rect.height;
@@ -125,6 +128,10 @@ public class FaceParts {
 				}
 			}
 		}
+	    void DrawEyeCircle(Mat im){
+	    	Core.ellipse(im, new Point(l_eye.x+l_eye_width/2,l_eye.y+l_eye_height/2), new Size(l_eye_width/2,l_eye_height/4), 0, 0, 360, new Scalar(255, 255, 255, 55), -1);
+	    	Core.ellipse(im, new Point(r_eye.x+r_eye_width/2,r_eye.y+r_eye_height/2), new Size(r_eye_width/2,r_eye_height/4), 0, 0, 360, new Scalar(255, 255, 255, 55), -1);
+	    }
 
 	    void GetNose(Mat im){
 
@@ -146,7 +153,7 @@ public class FaceParts {
 	    	MatOfRect mouthDetections = new MatOfRect();
 	    	mouthDetector.detectMultiScale(im, mouthDetections);
 	    	for (Rect rect : mouthDetections.toArray()) {
-	    		if(rect.y > (face.y + face_height*3/4) ){
+	    		if( (rect.y>=face.y+face_height/2) && (rect.x>=face.x) && (rect.x<=face.x+face_width) && (rect.y>=face.y) && (rect.y<=face.y+face_height)){
 	    			Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 0, 0), 5);
 	    			mouth=new Point(rect.x,rect.y);
 	    			mouth_width=rect.width;
@@ -172,17 +179,17 @@ public class FaceParts {
 	    	return data;
 	    }
 
-	    int[] RGBtoHSV(int red, int green, int blue){
+	    int[] RGBtoHSV(int blue, int green, int red){
 
         int[] hsv = new int[3];
-        float max = Math.max(red, Math.max(green, blue));
-        float  min = Math.min(red, Math.min(green, blue));
+        float max = Math.max(blue, Math.max(green, red));
+        float  min = Math.min(blue, Math.min(green, red));
 
         // h
         if(max == min)	hsv[0] = 0;
-        else if(max == red)	hsv[0] = (int) ((60 * (green - blue) / (max - min) + 360) % 360);
-        else if(max == green)	hsv[0] = (int) ((60 * (blue - red) / (max - min)) + 120);
-	    else if(max == blue)	hsv[0] = (int) ((60 * (red - green) / (max - min)) + 240);
+        else if(max == blue)	hsv[0] = (int) ((60 * (green - red) / (max - min) + 360) % 360);
+        else if(max == green)	hsv[0] = (int) ((60 * (red - blue) / (max - min)) + 120);
+	    else if(max == red)	hsv[0] = (int) ((60 * (blue - green) / (max - min)) + 240);
         // s
         if(max == 0)	hsv[1] = 0;
         else	hsv[1] = (int) (255 * ((max - min) / max));
@@ -200,3 +207,9 @@ public class FaceParts {
 
 
 }
+
+/*if( (x>=face.x) && (x<=face.x+face_width) && (y>=face.y) && (y<=face.y+face_height){
+
+
+}
+*/
