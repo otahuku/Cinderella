@@ -22,29 +22,35 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.json.simple.parser.ParseException;
+
 public class PictureOpen extends JFrame {
-	JLabel label;
+	JLabel label,donelabel;
     JPanel panel;
 	private JTextField textField;
 	Image img,area;
 	FilteredImageSource fis;
 	static int labelX,labelY;
 	File f;
+	String FilePath;
+	public static String agerange_b ="";
+	public static String agerange_a ="";
 
-	public static void main(String[] args) {
+
+	public static void main(String[] args) throws ParseException{
 		labelX = 240;
 		labelY = 320;
 		new PictureOpen();
 	}
 
-	public PictureOpen() {
+	public PictureOpen() throws ParseException{
 		init();
 	}
 
-	private void init() {
+	private void init() throws ParseException{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Cinderella");
-		setBounds(100, 100, 650, 450);
+		setBounds(100, 100, 660, 475);
 
 		JLabel lblNewLabel = new JLabel("Image");
 		lblNewLabel.setBounds(21, 22, 220, 29);
@@ -58,7 +64,7 @@ public class PictureOpen extends JFrame {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// 繝輔ぃ繧､繝ｫ驕ｸ謚槭ム繧､繧｢繝ｭ繧ｰ繧定｡ｨ遉ｺ縺励��驕ｸ謚槭＠縺溘ヵ繧｡繧､繝ｫ繧偵Λ繝吶Ν縺ｫ險ｭ螳壹☆繧九Γ繧ｽ繝�繝峨ｒ蜻ｼ縺ｳ蜃ｺ縺�
+				// ファイル選択ダイアログを表示し、選択したファイルをラベルに設定するメソッドを呼び出す
 				open();
 			}
 		});
@@ -69,7 +75,7 @@ public class PictureOpen extends JFrame {
 		btnImport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//蜉�鮨｢繝ｻ貂幃ｽ｢縺励◆逕ｻ蜒上ｒ菫晏ｭ倥☆繧九Γ繧ｽ繝�繝峨ｒ蜻ｼ縺ｳ蜃ｺ縺�
+				//加齢・減齢した画像を保存するメソッドを呼び出す
 				importimage();
 
 			}
@@ -77,11 +83,11 @@ public class PictureOpen extends JFrame {
 		panel.add(btnImport);
 
 		textField = new JTextField();
-		textField.setBounds(165, 20, 186, 31);
+		textField.setBounds(174, 20, 177, 31);
 		panel.add(textField);
 		textField.setColumns(10);
 
-		JLabel balabel = new JLabel("竍�");
+		JLabel balabel = new JLabel("⇒");
 		balabel.setBounds(275, 175, 100, 50);
 		balabel.setFont(new Font("serif", Font.PLAIN, 90));
 		panel.add(balabel);
@@ -93,51 +99,128 @@ public class PictureOpen extends JFrame {
 		btnDo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//蜉�鮨｢繝ｻ貂幃ｽ｢繝｡繧ｽ繝�繝韻inderella縺ｮ蜻ｼ縺ｳ蜃ｺ縺�
-
-
+				Resize.main(FilePath);
+				FacePartsJPG.main(FilePath);
+				MaskComplete.main(FilePath);
+				DoOpen();
 			}
 		});
 		panel.add(btnDo);
+		
+		
+		JLabel BfAgeRange = new JLabel();
+		BfAgeRange.setBounds(180, 389, 62, 23);
 
-		// 繝ｩ繝吶Ν菴懈��
+		JLabel AfAgeRange = new JLabel();
+		AfAgeRange.setBounds(527, 389, 62, 23);
+
+		JButton btnBf = new JButton("Measure");
+		btnBf.setBounds(28, 388, 84,25 );
+		btnBf.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//BlueMixで年齢を測定するFaceTestを実行
+					try {
+						agerange_b = FaceTestBefore.main(FilePath);
+						BfAgeRange.setText(agerange_b);
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
+			}
+		});
+		panel.add(btnBf);
+
+		JLabel BfAge = new JLabel("AgeRange:");
+		BfAge.setBounds(115, 389, 62, 23);
+		panel.add(BfAge);
+		panel.add(BfAgeRange);
+
+		JButton btnAf = new JButton("Measure");
+		btnAf.setBounds(375, 388, 84,25 );
+		btnAf.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//BlueMixで年齢を測定するFaceTestを実行
+					try {
+						agerange_a = FaceTestAfter.main(FilePath);
+						AfAgeRange.setText(agerange_a);
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
+			}
+		});
+		panel.add(btnAf);
+
+		JLabel AfAge = new JLabel("AgeRange:");
+		AfAge.setBounds(462, 389, 62, 23);
+		panel.add(AfAge);
+		panel.add(AfAgeRange);
+
+		// ラベル作成
 		label = new JLabel();
-		label.setBounds(35, 50, labelX, labelY);
+		label.setBounds(35, 60, labelX, labelY);
 		panel.add(label);
+
+		donelabel = new JLabel();
+		donelabel.setBounds(380, 60, labelX, labelY);
+		panel.add(donelabel);
+
 
 		this.add(panel);
 
-		// 繝輔Ξ繝ｼ繝�繧定｡ｨ遉ｺ
+		// フレームを表示
 		setVisible(true);
 	}
 
-	// 繝輔ぃ繧､繝ｫ驕ｸ謚槭ム繧､繧｢繝ｭ繧ｰ繧定｡ｨ遉ｺ縺励��驕ｸ謚槭＠縺溘ヵ繧｡繧､繝ｫ繧帝｣溘∋繧九↓險ｭ螳�
+
+	// ファイル選択ダイアログを表示し、選択したファイルを食べるに設定
 	private void open() {
 		JFileChooser fc = new JFileChooser();
-		// 逕ｻ蜒上ヵ繧｡繧､繝ｫ縺ｮ諡｡蠑ｵ蟄舌ｒ險ｭ螳�
-		fc.setFileFilter(new FileNameExtensionFilter("逕ｻ蜒上ヵ繧｡繧､繝ｫ", "png", "jpg",
+		// 画像ファイルの拡張子を設定
+		fc.setFileFilter(new FileNameExtensionFilter("画像ファイル", "png", "jpg",
 				"Jpeg", "GIF", "bmp"));
-		// 繝輔ぃ繧､繝ｫ驕ｸ謚槭ム繧､繧｢繝ｭ繧ｰ繧定｡ｨ遉ｺ縲∵綾繧雁�､縺窟PPROVE_OPTION縺ｮ蝣ｴ蜷育判蜒上ヵ繧｡繧､繝ｫ繧帝幕縺�
+		// ファイル選択ダイアログを表示、戻り値がAPPROVE_OPTIONの場合画像ファイルを開く
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 
 			f = fc.getSelectedFile();
-			// 繧｢繧､繧ｳ繝ｳ繧偵Λ繝吶Ν縺ｫ險ｭ螳�
+			FilePath = RemoveFileExtension(f);
+			System.out.println(FilePath);
+			// アイコンをラベルに設定
 			ImageIcon icon = new ImageIcon(f.getPath());
 
 			img = icon.getImage();
 
-			//label縺ｮ繧ｵ繧､繧ｺ縺ｫ逕ｻ蜒上ｒ繝ｪ繧ｵ繧､繧ｺ
-			imageresize(icon,labelX,labelY);
+			//labelのサイズに画像をリサイズ
+			imageresize(icon,labelX,labelY,img);
 
 			icon.setImage(area);
 			label.setIcon(icon);
+			textField.setText(f.getAbsolutePath());
 
 			System.out.print("ttttt");
 		}
 		System.out.print("xxxxxxx");
 	}
 
-	public void imageresize(ImageIcon i,int MW,int MH){
+	private void DoOpen() {
+
+			// アイコンをラベルに設定
+			ImageIcon doneicon = new ImageIcon(FilePath+"_re_new.jpg");
+
+			Image doneimg = doneicon.getImage();
+
+			//labelのサイズに画像をリサイズ
+			imageresize(doneicon,labelX,labelY,doneimg);
+
+			doneicon.setImage(area);
+			donelabel.setIcon(doneicon);
+
+			System.out.println("DoneOpen");
+
+	}
+
+
+	public void imageresize(ImageIcon i,int MW,int MH,Image im){
 		int resizeX = 0;
 		int resizeY = 0;
 
@@ -154,7 +237,7 @@ public class PictureOpen extends JFrame {
 		}
 
 		ImageFilter fl = new AreaAveragingScaleFilter(resizeX,resizeY);
-		fis = new FilteredImageSource(img.getSource(),fl);
+		fis = new FilteredImageSource(im.getSource(),fl);
 		area = createImage(fis);
 	}
 
@@ -162,19 +245,34 @@ public class PictureOpen extends JFrame {
 		BufferedImage bi = null;
 
 		try{
-		    bi = ImageIO.read(f);
+		    bi = ImageIO.read(new File(FilePath+"_re_new.jpg"));
 			System.out.println("aaaaaaaaa");
 
 		} catch(IOException e){
 			System.out.println("Miss");
 		}
 		try {
-			ImageIO.write(bi, "jpeg", new File("Cinderellaed.jpg"));
+			ImageIO.write(bi, "jpeg", new File(FilePath+"Cinderellaed.jpg"));
+			File newimage = new File(FilePath+"_re_new.jpg");
+			newimage.delete();
 		} catch(IOException e){
 			System.out.println("Miss");
 		}
 		System.out.println("importimage");
 
-
 	}
+
+	public static String RemoveFileExtension(File file){
+		String filename = file.getAbsolutePath();
+		int lastDotPos = filename.lastIndexOf('.');
+
+		if (lastDotPos == -1){
+			return filename;
+		}else if (lastDotPos == 0){
+			return 	filename;
+		}else {
+			return filename.substring(0, lastDotPos);
+		}
+	}
+
 }
