@@ -118,7 +118,7 @@ public class FacePartsPNG {
 			MatOfRect eyeDetections = new MatOfRect();
 			eyeDetector.detectMultiScale(im, eyeDetections);
 			for (Rect rect : eyeDetections.toArray()) {
-				if((rect.x > (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width > (face.x + face_width/2)) ){
+				if((rect.x>face.x) && (rect.y>face.y) && (rect.x > (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width > (face.x + face_width/2)) ){
 		    		//Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255), 5);
 					l_eye=new Point(rect.x,rect.y);
 		            l_eye_width=rect.width;
@@ -133,7 +133,7 @@ public class FacePartsPNG {
 			MatOfRect eyeDetections = new MatOfRect();
 			eyeDetector.detectMultiScale(im, eyeDetections);
 			for (Rect rect : eyeDetections.toArray()) {
-				if((rect.x < (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width < (face.x + face_width/2)) ){
+				if((rect.x>face.x) && (rect.y>face.y) && (rect.x < (face.x + face_width/2) ) && (rect.y < (face.y + face_height/2) ) && (rect.x+rect.width < (face.x + face_width/2)) ){
 		    		//Core.rectangle(im, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 180, 255), 5);
 					r_eye=new Point(rect.x,rect.y);
 		            r_eye_width=rect.width;
